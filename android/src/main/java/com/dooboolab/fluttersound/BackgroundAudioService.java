@@ -1,5 +1,6 @@
 package com.dooboolab.fluttersound;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -58,6 +59,7 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
     public static Callable skipTrackBackwardHandler;
     public static Function playbackStateUpdater;
     public static boolean includeAudioPlayerFeatures;
+    public static Activity activity;
 
     public final static int PLAYING_STATE = 0;
     public final static int PAUSED_STATE = 1;
@@ -178,8 +180,8 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
             // Reset the media player
             mMediaPlayer.reset();
 
-            // Remove the notification
-            NotificationManagerCompat.from(BackgroundAudioService.this).cancel(1);
+            // Stop the service
+            stopBackgroundAudioService();
 
             // Update the playback state
             playbackStateUpdater.apply(STOPPED_STATE);
@@ -230,8 +232,18 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
         // Start the audio player
         mMediaPlayer.start();
 
+        // Start the service
+        startService(new Intent(activity, BackgroundAudioService.class));
+
         // Update the playback state
         playbackStateUpdater.apply(PLAYING_STATE);
+    }
+
+    private void stopBackgroundAudioService() {
+        // Remove the notification
+        stopForeground(true);
+        // Stop the service
+        stopSelf();
     }
 
 
@@ -347,7 +359,9 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
             mIsNoisyReceiverRegistered = false;
         }
 
-        NotificationManagerCompat.from(this).cancel(1);
+        // Stop the service
+        stopBackgroundAudioService();
+
         resetMediaPlayer();
     }
 
@@ -573,7 +587,7 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
             return;
         }
 
-        NotificationManager notificationManager = null;
+        // NotificationManager notificationManager = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // Get the audio metadata
             MediaControllerCompat controller = mMediaSessionCompat.getController();
@@ -640,20 +654,26 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
                 builder.setChannelId(notificationChannelId);
 
                 // Get the notification manager and create the notification channel
-                notificationManager = context.getSystemService(NotificationManager.class);
-                notificationManager.createNotificationChannel(channel);
+                // notificationManager = context.getSystemService(NotificationManager.class);
+                // notificationManager.createNotificationChannel(channel);
             }
 
+            // Build the notification
+            Notification notification = builder.build();
+
             // Check whether a notification manager have already been created
-            if (notificationManager == null) {
-                // The notification manager has not been created yet, then create it now
-                NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-                // Send the notification
-                notificationManagerCompat.notify(1, builder.build());
-            } else {
-                // The notification manager has already been created, then send the notification
-                notificationManager.notify(1, builder.build());
-            }
+//            if (notificationManager == null) {
+//                // The notification manager has not been created yet, then create it now
+//                NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+//                // Send the notification
+//                notificationManagerCompat.notify(1, notification);
+//            } else {
+//                // The notification manager has already been created, then send the notification
+//                notificationManager.notify(1, notification);
+//            }
+
+            // Display the notification and place the service in the foreground
+            startForeground(1, notification);
 
         }
     }

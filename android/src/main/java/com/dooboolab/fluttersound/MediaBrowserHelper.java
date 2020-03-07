@@ -104,6 +104,8 @@ public class MediaBrowserHelper {
                 mActivity.getIntent().getExtras()
         );
 
+        BackgroundAudioService.activity = mActivity;
+
         mMediaBrowserCompat.connect();
     }
 
