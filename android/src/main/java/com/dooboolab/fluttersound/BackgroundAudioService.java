@@ -128,7 +128,7 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
                 // Show a notification to handle the media playback
                 showPausedNotification();
 
-                // DEBUG
+                // Stop the service (allow the user to dismiss the notification)
                 stopBackgroundAudioService(false);
 
                 // Update the playback state
