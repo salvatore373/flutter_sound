@@ -128,6 +128,9 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
                 // Show a notification to handle the media playback
                 showPausedNotification();
 
+                // DEBUG
+                stopBackgroundAudioService(false);
+
                 // Update the playback state
                 playbackStateUpdater.apply(PAUSED_STATE);
             }
@@ -181,7 +184,7 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
             mMediaPlayer.reset();
 
             // Stop the service
-            stopBackgroundAudioService();
+            stopBackgroundAudioService(true);
 
             // Update the playback state
             playbackStateUpdater.apply(STOPPED_STATE);
@@ -239,9 +242,9 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
         playbackStateUpdater.apply(PLAYING_STATE);
     }
 
-    private void stopBackgroundAudioService() {
+    private void stopBackgroundAudioService(boolean removeNotification) {
         // Remove the notification
-        stopForeground(true);
+        stopForeground(removeNotification);
         // Stop the service
         stopSelf();
     }
@@ -360,7 +363,7 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
         }
 
         // Stop the service
-        stopBackgroundAudioService();
+        stopBackgroundAudioService(true);
 
         resetMediaPlayer();
     }
@@ -434,6 +437,12 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
             mMediaSessionCompat.setMediaButtonReceiver(pendingIntent);
         }
+
+        // Set the session activity
+        Context context = getApplicationContext();
+        Intent intent = new Intent(context, activity.getClass());
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mMediaSessionCompat.setSessionActivity(pendingIntent);
 
         // Pass the media session token to this service
         setSessionToken(mMediaSessionCompat.getSessionToken());

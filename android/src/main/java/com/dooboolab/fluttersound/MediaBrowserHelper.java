@@ -6,6 +6,7 @@ import android.os.RemoteException;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 
 import androidx.arch.core.util.Function;
 
@@ -39,7 +40,8 @@ public class MediaBrowserHelper {
                 // MediaControllerCompat.getMediaController(mActivity).getTransportControls().playFromMediaId("http://path-to-audio-file.com", null);
 
             } catch (RemoteException e) {
-
+                Log.e("MediaBrowserHelper", "The following error occurred while" +
+                        " initializing the media controller.", e);
             }
 
             // Call the successful connection callback if it was provided
