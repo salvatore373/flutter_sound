@@ -70,6 +70,10 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
      */
     public static Track currentTrack;
 
+    // Whether the system is displaying the playing or the paused notification
+    private boolean mIsPlayingNotificationActive = false;
+    private boolean mIsPausedNotificationActive = false;
+
     private boolean mIsNoisyReceiverRegistered;
     private MediaPlayer mMediaPlayer;
     private MediaSessionCompat mMediaSessionCompat;
@@ -229,11 +233,11 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
         mMediaSessionCompat.setActive(true);
         setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING);
 
-        // Show a notification to handle the media playback
-        showPlayingNotification();
-
         // Start the audio player
         mMediaPlayer.start();
+
+        // Show a notification to handle the media playback
+        showPlayingNotification();
 
         // Start the service
         startService(new Intent(activity, BackgroundAudioService.class));
@@ -247,6 +251,12 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
         stopForeground(removeNotification);
         // Stop the service
         stopSelf();
+
+        // Check whether the notification was removed
+        if(removeNotification) {
+            mIsPlayingNotificationActive = false;
+            mIsPausedNotificationActive = false;
+        }
     }
 
 
@@ -564,6 +574,9 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
 
         // Show the notification
         displayNotification(getApplicationContext(), actionPause);
+
+        mIsPlayingNotificationActive = true;
+        mIsPausedNotificationActive = false;
     }
 
     /**
@@ -581,6 +594,9 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
 
         // Show the notification
         displayNotification(getApplicationContext(), actionPlay);
+
+        mIsPausedNotificationActive = true;
+        mIsPlayingNotificationActive = false;
     }
 
     /**
@@ -713,6 +729,15 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
         protected void onPostExecute(Bitmap bitmap) {
             // Reinitialize the metadata when the image has been downloaded
             initMediaSessionMetadata(bitmap);
+
+            // If the system was displaying a playback notification, update it with the just
+            // retrieved album art.
+            if(mIsPlayingNotificationActive) {
+                showPlayingNotification();
+            }
+            else if(mIsPausedNotificationActive) {
+                showPausedNotification();
+            }
 
             super.onPostExecute(bitmap);
         }
