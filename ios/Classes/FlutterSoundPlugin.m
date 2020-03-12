@@ -74,6 +74,7 @@ FlutterMethodChannel* _channel;
 
 MPRemoteCommandCenter *commandCenter;
 NSURLSessionDataTask *trackDownloadTask;
+MPMediaItemArtwork *currentAlbumArt;
 bool isPlaying = false;
 BOOL includeAPFeatures = false;
 
@@ -142,6 +143,13 @@ BOOL includeAPFeatures = false;
      @"current_position" : [currentTime stringValue],
      };
      */
+    
+    // Update now playing with the latests info about the playing track (only when
+    // the album art has already been retrieved, otherwise we would start a
+    // new request).
+    if(currentAlbumArt != nil){
+        [self setupNowPlaying:currentAlbumArt];
+    }
         
     // Pass the string containing the status of the playback to the native code
     [_channel invokeMethod:@"updateProgress" arguments:status];
@@ -609,7 +617,7 @@ BOOL includeAPFeatures = false;
             UIImage *artworkImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
             if(artworkImage)
             {
-                MPMediaItemArtwork *currentAlbumArt = [[MPMediaItemArtwork alloc] initWithImage: artworkImage];
+                currentAlbumArt = [[MPMediaItemArtwork alloc] initWithImage: artworkImage];
                 
                 [self setupNowPlaying:currentAlbumArt];
             }
