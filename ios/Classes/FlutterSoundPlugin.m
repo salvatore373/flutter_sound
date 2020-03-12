@@ -73,6 +73,7 @@ bool shouldProcessDbLevel = false;
 FlutterMethodChannel* _channel;
 
 MPRemoteCommandCenter *commandCenter;
+NSURLSessionDataTask *trackDownloadTask;
 bool isPlaying = false;
 BOOL includeAPFeatures = false;
 
@@ -141,7 +142,7 @@ BOOL includeAPFeatures = false;
      @"current_position" : [currentTime stringValue],
      };
      */
-    
+        
     // Pass the string containing the status of the playback to the native code
     [_channel invokeMethod:@"updateProgress" arguments:status];
 }
@@ -403,7 +404,13 @@ BOOL includeAPFeatures = false;
         
         // Check whether the file path poits to a remote or local file
         if (isRemote) {
-            NSURLSessionDataTask *downloadTask = [[NSURLSession sharedSession]
+            // Cancel the task that is retrieving the previous song, if there is one
+            if(trackDownloadTask != nil) {
+                [trackDownloadTask cancel];
+            }
+            
+            // Retrieve the current song
+            trackDownloadTask = [[NSURLSession sharedSession]
                                                   dataTaskWithURL:audioFileURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                                                       // NSData *data = [NSData dataWithContentsOfURL:audioFileURL];
                                                       
@@ -430,7 +437,7 @@ BOOL includeAPFeatures = false;
                                                       result(filePath);
                                                   }];
             
-            [downloadTask resume];
+            [trackDownloadTask resume];
         } else {
             // Initialize the audio player with the file that the given path points to,
             // and start playing.
@@ -602,9 +609,9 @@ BOOL includeAPFeatures = false;
             UIImage *artworkImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:url]];
             if(artworkImage)
             {
-                MPMediaItemArtwork *albumArt = [[MPMediaItemArtwork alloc] initWithImage: artworkImage];
+                MPMediaItemArtwork *currentAlbumArt = [[MPMediaItemArtwork alloc] initWithImage: artworkImage];
                 
-                [self setupNowPlaying:albumArt];
+                [self setupNowPlaying:currentAlbumArt];
             }
         });
     } else {
