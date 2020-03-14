@@ -149,6 +149,9 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
             // Change audio track
 
             try {
+                // Release any data source before setting a new one
+                mMediaPlayer.reset();
+
                 // Pass the given path to the media player
                 mMediaPlayer.setDataSource(mediaId);
 
