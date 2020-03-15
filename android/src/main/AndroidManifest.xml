@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="com.dooboolab.fluttersound">
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Add the permission to use a foreground service in Android 9 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application>
         <receiver android:name="androidx.media.session.MediaButtonReceiver" >

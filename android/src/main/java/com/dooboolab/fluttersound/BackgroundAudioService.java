@@ -22,6 +22,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.provider.SyncStateContract;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -683,7 +684,8 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
 
                 // Get the notification manager and create the notification channel
                 // notificationManager = context.getSystemService(NotificationManager.class);
-                // notificationManager.createNotificationChannel(channel);
+                NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+                notificationManager.createNotificationChannel(channel);
             }
 
             // Build the notification
@@ -702,7 +704,6 @@ public class BackgroundAudioService extends MediaBrowserServiceCompat implements
 
             // Display the notification and place the service in the foreground
             startForeground(1, notification);
-
         }
     }
 
