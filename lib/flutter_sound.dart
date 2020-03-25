@@ -364,14 +364,14 @@ class FlutterSound {
   Future<String> startPlayerFromTrack(
       Track track, bool canSkipForward, bool canSkipBackward) async {
     // Check whether we can start the player
-    if (_playbackState != null &&
-        _playbackState != PlaybackState.STOPPED &&
-        _playbackState != PlaybackState.COMPLETED) {
-      throw PlayerRunningException(
-          'Cannot start player in playback state "$_playbackState". The player '
-          'must be just initialized or in "${PlaybackState.STOPPED}" '
-          'state');
-    }
+//    if (_playbackState != null &&
+//        _playbackState != PlaybackState.STOPPED &&
+//        _playbackState != PlaybackState.COMPLETED) {
+//      throw PlayerRunningException(
+//          'Cannot start player in playback state "$_playbackState". The player '
+//          'must be just initialized or in "${PlaybackState.STOPPED}" '
+//          'state');
+//    }
 
     // Check the current codec is not supported on this platform
     if (!await isDecoderSupported(track.codec)) {

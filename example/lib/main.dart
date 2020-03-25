@@ -242,7 +242,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void startPlayer() async {
+  Future<void> startPlayer() async {
     try {
       _addListeners();
 
@@ -278,13 +278,13 @@ class _MyAppState extends State<MyApp> {
       // Check whether the user wants to use the audio player features
       if (_isAudioPlayer) {
         final track = Track(
-          trackPath: audioFilePath,
-          dataBuffer: buffer,
-          codec: buffer == null ? null : _codec,
-          trackTitle: "Song Title",
-          trackAuthor: "Song Author",
-          albumArtUrl: albumArtPath,
-        );
+                trackPath: audioFilePath,
+                dataBuffer: buffer,
+                codec: buffer == null ? null : _codec,
+                trackTitle: "Song Title",
+                trackAuthor: "Song Author",
+                albumArtUrl: albumArtPath,
+              );
         path = await flutterSound.startPlayerFromTrack(track, true, false);
       } else {
         if (audioFilePath != null) {
